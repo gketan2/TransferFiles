@@ -2,8 +2,9 @@ package com.k10.transferfiles.utils
 
 enum class FileType {
     FOLDER,
-    OTHER,
+    UNKNOWN,
     AUDIO, // mp3, wav,
+    IMAGE, // jpg, jpeg, png
     VIDEO, // mp4, mkv, mov
     TEXT;  // txt, doc, docx
 
@@ -11,9 +12,10 @@ enum class FileType {
         fun getFileTypeFromExtension(extension: String): FileType {
             return when (extension) {
                 "mp3", "wav" -> AUDIO
+                "jpg", "jpeg", "png" -> IMAGE
                 "mp4", "mkv", "mov" -> VIDEO
                 "txt", "doc", "docx" -> TEXT
-                else -> OTHER
+                else -> UNKNOWN
             }
         }
     }

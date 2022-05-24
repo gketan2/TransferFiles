@@ -28,4 +28,20 @@ object Extensions {
     fun String.isHiddenFile(): Boolean {
         return this.split(".")[0].isEmpty()
     }
+
+    fun <T> List<T>.print() {
+        println("-------")
+        this.forEach {
+            println(it)
+        }
+        println("-------")
+    }
+
+    fun <T> Array<T>.print() {
+        println("-------")
+        this.forEach {
+            println(it)
+        }
+        println("-------")
+    }
 }

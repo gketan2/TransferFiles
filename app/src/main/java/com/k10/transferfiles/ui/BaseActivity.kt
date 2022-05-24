@@ -9,13 +9,9 @@ import android.os.Build
 import android.os.Environment
 import android.provider.Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION
 import android.provider.Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION
-import android.widget.Toast
-import android.widget.Toast.LENGTH_LONG
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.android.material.dialog.MaterialDialogs
 import com.k10.transferfiles.ui.main.MainActivity
 import com.k10.transferfiles.ui.splash.SplashActivity
 import com.k10.transferfiles.utils.Constants.STORAGE_PERMISSION_CODE
@@ -59,7 +55,10 @@ open class BaseActivity : AppCompatActivity() {
                         )
                     } catch (e: Exception) {
                         startActivity(
-                            Intent(ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION)
+                            Intent(ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION).apply{
+                                addCategory("android.intent.category.DEFAULT")
+                                data = Uri.fromParts("package", packageName, null)
+                            }
                         )
                     }
                     dialogInterface.dismiss()
