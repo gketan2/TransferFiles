@@ -26,10 +26,4 @@ class AppModule {
         return context.getSharedPreferences(CONFIG_PREFERENCE, Context.MODE_PRIVATE)
     }
 
-    @Provides
-    @Named(CONFIG_PREFERENCE)
-    fun getSharedPreferenceEditor(@Named(CONFIG_PREFERENCE) sp: SharedPreferences): SharedPreferences.Editor {
-        return sp.edit()
-    }
-
 }

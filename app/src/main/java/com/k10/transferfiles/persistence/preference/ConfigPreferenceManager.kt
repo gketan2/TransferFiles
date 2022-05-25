@@ -7,8 +7,7 @@ import javax.inject.Inject
 import javax.inject.Named
 
 class ConfigPreferenceManager @Inject constructor(
-    @Named(CONFIG_PREFERENCE) private val sharedPreferences: SharedPreferences,
-    @Named(CONFIG_PREFERENCE) private val sharedPreferencesEditor: SharedPreferences.Editor
+    @Named(CONFIG_PREFERENCE) private val sharedPreferences: SharedPreferences
 ) {
 
     private fun showHiddenFiles(): Boolean {
@@ -16,7 +15,7 @@ class ConfigPreferenceManager @Inject constructor(
     }
 
     fun setShowHiddenFiles(show: Boolean) {
-        return sharedPreferencesEditor.putBoolean(SHOW_HIDDEN_FILES, show).apply()
+        return sharedPreferences.edit().putBoolean(SHOW_HIDDEN_FILES, show).apply()
     }
 
     fun getConfigPreference(): ConfigPreference {
