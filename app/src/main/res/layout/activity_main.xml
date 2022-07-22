@@ -6,6 +6,15 @@
     android:layout_height="match_parent"
     tools:context=".ui.main.MainActivity">
 
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="0dp"
+        android:layout_height="5dp"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:indeterminate="true"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/fileListRecycler"

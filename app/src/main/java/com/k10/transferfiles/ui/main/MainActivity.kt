@@ -10,6 +10,7 @@ import com.k10.transferfiles.R
 import com.k10.transferfiles.databinding.ActivityMainBinding
 import com.k10.transferfiles.models.FileObject
 import com.k10.transferfiles.ui.BaseActivity
+import com.k10.transferfiles.utils.Extensions.visible
 import com.k10.transferfiles.utils.ResultStatus
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.Timer
@@ -28,16 +29,18 @@ class MainActivity : BaseActivity(), FileListCommunicator {
         setContentView(binding.root)
 
         setUpRecycler()
-        //TODO make the following getFilesInPath call rotation aware
         viewModel.getFilesInPath()
         viewModel.fileListLiveData.observe(this) {
             when (it.status) {
                 ResultStatus.LOADING -> {
+                    binding.progressBar.visible = true
                 }
                 ResultStatus.SUCCESS -> {
+                    binding.progressBar.visible = false
                     fileListAdapter.submitList(it.data?.files!!)
                 }
                 ResultStatus.FAILED -> {
+                    binding.progressBar.visible = false
                 }
             }
         }
@@ -50,10 +53,10 @@ class MainActivity : BaseActivity(), FileListCommunicator {
         hiddenItem?.setActionView(R.layout.switch_for_menu)
 
         val hiddenSwitch = hiddenItem?.actionView?.findViewById<SwitchMaterial>(R.id.hidden_switch)
-        hiddenSwitch?.isChecked = viewModel.showHiddenFile
+        hiddenSwitch?.isChecked = viewModel.getShowHiddenFiles()
 
         hiddenSwitch?.setOnCheckedChangeListener { _, isChecked ->
-            viewModel.showHiddenFile = isChecked
+            viewModel.setShowHiddenFiles(isChecked)
         }
         return true
     }
@@ -67,7 +70,10 @@ class MainActivity : BaseActivity(), FileListCommunicator {
     }
 
     override fun onFolderClick(fileObject: FileObject) {
-        viewModel.getFilesInPath(fileObject.path)
+        if(fileObject.isAccessible)
+            viewModel.getFilesInPath(fileObject.path)
+        else
+            Toast.makeText(this, "Can not access this folder.", Toast.LENGTH_SHORT).show()
     }
 
     override fun onFileClick(fileObject: FileObject) {

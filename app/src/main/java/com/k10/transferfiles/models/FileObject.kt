@@ -10,5 +10,6 @@ data class FileObject(
     val isFolder: Boolean,
     val size: Long,
     val formattedSize: String,
-    val isHidden: Boolean = false
+    val isHidden: Boolean = false,
+    val isAccessible: Boolean = true
 )

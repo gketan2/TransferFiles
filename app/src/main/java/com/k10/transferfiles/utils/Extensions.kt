@@ -1,5 +1,8 @@
 package com.k10.transferfiles.utils
 
+import android.view.View
+import android.view.View.INVISIBLE
+import android.view.View.VISIBLE
 import java.io.File
 import java.math.RoundingMode.UP
 import java.text.DecimalFormat
@@ -23,7 +26,7 @@ object Extensions {
         return if (this.isDirectory) {
             val length = this.listFiles()
                 ?.filter { file -> !(!showHidden && file.isHidden) }?.size
-                ?: 0
+                ?: -1
             Pair(length.toLong(), "(${length})")
         } else {
             Pair(
@@ -39,6 +42,12 @@ object Extensions {
         }
         return df.format(this)
     }
+
+    var View.visible: Boolean
+        get() = visibility == VISIBLE
+        set(value) {
+            visibility = if (value) VISIBLE else View.GONE
+        }
 
     fun String.isHiddenFile(): Boolean {
         return this.split(".")[0].isEmpty()

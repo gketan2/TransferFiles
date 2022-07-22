@@ -26,7 +26,7 @@ class MainActivityViewModel @Inject constructor(
     private val configPreferenceManager: ConfigPreferenceManager
 ) : ViewModel() {
 
-    private var currentPath = ""
+    private var currentPath = rootPath
     private val _fileListLiveData: MediatorLiveData<ResultWrapper<FileListObject>> =
         MediatorLiveData()
     val fileListLiveData: LiveData<ResultWrapper<FileListObject>> = _fileListLiveData
@@ -39,23 +39,24 @@ class MainActivityViewModel @Inject constructor(
      * @param  path
      *         path of directory to get file list
      */
-    fun getFilesInPath(path: String = rootPath) {
+    fun getFilesInPath(path: String = currentPath) {
         viewModelScope.launch(IO) {
 
             _fileListLiveData.postValue(ResultWrapper.loading(_fileListLiveData.value?.data))
 
-            val result: ArrayList<FileObject> = ArrayList()
-
-            //adding ..
-            if (path != rootPath) {
-                result.add(
-                    FileObject("..", "", FileType.UNKNOWN, "$path/..", true, 0, "")
-                )
-            }
             val files = File(path).listFiles()
             if (files != null) {
-                //TODO should replace with showHiddenFile if not changes from anywhere else
-                val configs = configPreferenceManager.getConfigPreference()
+                val result: ArrayList<FileObject> = ArrayList()
+
+                //adding ..
+                if (path != rootPath) {
+                    result.add(
+                        FileObject("..", "", FileType.UNKNOWN, "$path/..", true, 0, "")
+                    )
+                }
+
+                val configs = configPreferenceManager.getConfigurations()
+
                 //sort according to preference
                 files.sortWith(FileOperations.getComparatorForFileSorting(SortType.HIDDEN))
                 for (i in files.indices) {
@@ -63,7 +64,13 @@ class MainActivityViewModel @Inject constructor(
                     if (!configs.showHidden && files[i].isHidden)
                         continue
 
-                    result.add(FileObjectMapper.fileToFileObject(files[i], configs.showHidden))
+                    val data = FileObjectMapper.fileToFileObject(files[i], configs.showHidden)
+
+                    //skipping inaccessible files based on preference
+                    if (!configs.showInAccessible && !data.isAccessible)
+                        continue
+
+                    result.add(data)
                 }
                 result.print()
                 _fileListLiveData.postValue(ResultWrapper.success(FileListObject(path, result)))
@@ -82,12 +89,11 @@ class MainActivityViewModel @Inject constructor(
     }
 
     //change to configPreference object once all options decided
-    var showHiddenFile: Boolean = configPreferenceManager.getConfigPreference().showHidden
-        set(value) {
-            configPreferenceManager.setShowHiddenFiles(value)
-            getFilesInPath(currentPath)
-            field = value
-        }
+    fun setShowHiddenFiles(showHidden: Boolean) {
+        configPreferenceManager.setShowHiddenFiles(showHidden)
+    }
+
+    fun getShowHiddenFiles() = configPreferenceManager.getConfigurations().showHidden
 
     /**
      * Shows files in parent folder, if it is root path,

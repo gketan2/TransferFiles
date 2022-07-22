@@ -8,18 +8,19 @@ import java.io.File
 
 object FileObjectMapper {
     fun fileToFileObject(file: File, showHidden: Boolean = false): FileObject{
-        val nameAndextenstion = FileOperations.getFileNameAndExtension(file.name, file.isDirectory)
-        val sizeAndlength = file.getSize(showHidden)
+        val nameAndExtension = FileOperations.getFileNameAndExtension(file.name, file.isDirectory)
+        val sizeAndLength = file.getSize(showHidden)
         return FileObject(
-            nameAndextenstion.first,
-            nameAndextenstion.second,
-            if (file.isDirectory) FileType.FOLDER
-            else FileType.getFileTypeFromExtension(nameAndextenstion.second),//files[i].extension),
-            file.canonicalPath,
-            file.isDirectory,
-            sizeAndlength.first, //if (file.isDirectory) file.list()?.let{ return@let it.size.toLong() } ?: 0 else file.length(), //in bytes
-            sizeAndlength.second, //if (file.isDirectory) "(" + (file.list()?.let{ return@let it.size } ?: 0) + ")" else file.length().getFileSize(),
-            isHidden = file.isHidden
+            name = nameAndExtension.first,
+            extension = nameAndExtension.second,
+            fileType = if (file.isDirectory) FileType.FOLDER
+            else FileType.getFileTypeFromExtension(nameAndExtension.second),
+            path = file.canonicalPath,
+            isFolder = file.isDirectory,
+            size = if(sizeAndLength.first == -1L) 0L else sizeAndLength.first,
+            formattedSize = if(sizeAndLength.first == -1L) "" else sizeAndLength.second,
+            isHidden = file.isHidden,
+            isAccessible = sizeAndLength.first != -1L
         )
     }
 }
