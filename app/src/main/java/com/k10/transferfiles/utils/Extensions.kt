@@ -1,10 +1,11 @@
 package com.k10.transferfiles.utils
 
+import java.io.File
 import java.math.RoundingMode.UP
 import java.text.DecimalFormat
 
 object Extensions {
-    fun Long.getFileSize(): String {
+    private fun Long.getFileSize(): String {
         if (this < 1024)
             return "${this}B"
         var size = this.toDouble()
@@ -16,6 +17,20 @@ object Extensions {
             return "${size.trimTwoDecimalPoint()}MB"
         size /= 1024
         return "${size.trimTwoDecimalPoint()}GB"
+    }
+
+    fun File.getSize(showHidden: Boolean): Pair<Long, String> {
+        return if (this.isDirectory) {
+            val length = this.listFiles()
+                ?.filter { file -> !(!showHidden && file.isHidden) }?.size
+                ?: 0
+            Pair(length.toLong(), "(${length})")
+        } else {
+            Pair(
+                this.length(),
+                this.length().getFileSize()
+            )
+        }
     }
 
     fun Double.trimTwoDecimalPoint(): String {

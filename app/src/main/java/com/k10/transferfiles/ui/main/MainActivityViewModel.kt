@@ -8,6 +8,7 @@ import com.k10.transferfiles.models.FileListObject
 import com.k10.transferfiles.models.FileObject
 import com.k10.transferfiles.models.mapper.FileObjectMapper
 import com.k10.transferfiles.persistence.preference.ConfigPreferenceManager
+import com.k10.transferfiles.utils.Extensions.print
 import com.k10.transferfiles.utils.FileOperations
 import com.k10.transferfiles.utils.FileType
 import com.k10.transferfiles.utils.ResultWrapper
@@ -48,7 +49,7 @@ class MainActivityViewModel @Inject constructor(
             //adding ..
             if (path != rootPath) {
                 result.add(
-                    FileObject("..", "", FileType.UNKNOWN, "$rootPath/..", true, 0, "")
+                    FileObject("..", "", FileType.UNKNOWN, "$path/..", true, 0, "")
                 )
             }
             val files = File(path).listFiles()
@@ -62,8 +63,9 @@ class MainActivityViewModel @Inject constructor(
                     if (!configs.showHidden && files[i].isHidden)
                         continue
 
-                    result.add(FileObjectMapper.fileToFileObject(files[i]))
+                    result.add(FileObjectMapper.fileToFileObject(files[i], configs.showHidden))
                 }
+                result.print()
                 _fileListLiveData.postValue(ResultWrapper.success(FileListObject(path, result)))
                 //current path is also stored in live data, but is stored in variable to access directly in code
                 currentPath = File(path).canonicalPath
@@ -79,6 +81,7 @@ class MainActivityViewModel @Inject constructor(
         }
     }
 
+    //change to configPreference object once all options decided
     var showHiddenFile: Boolean = configPreferenceManager.getConfigPreference().showHidden
         set(value) {
             configPreferenceManager.setShowHiddenFiles(value)
