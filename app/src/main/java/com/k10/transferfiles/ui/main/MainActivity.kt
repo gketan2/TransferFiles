@@ -46,10 +46,9 @@ class MainActivity : BaseActivity(), FileListCommunicator {
         }
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.menu_config_select, menu)
-
-        val hiddenItem = menu?.findItem(R.id.show_hidden_files)
+        val hiddenItem = menu.findItem(R.id.show_hidden_files)
         hiddenItem?.setActionView(R.layout.switch_for_menu)
 
         val hiddenSwitch = hiddenItem?.actionView?.findViewById<SwitchMaterial>(R.id.hidden_switch)

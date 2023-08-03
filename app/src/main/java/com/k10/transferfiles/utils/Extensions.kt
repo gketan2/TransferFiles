@@ -1,8 +1,9 @@
 package com.k10.transferfiles.utils
 
+import android.net.Uri
 import android.view.View
-import android.view.View.INVISIBLE
 import android.view.View.VISIBLE
+import com.k10.transferfiles.models.FileObject
 import java.io.File
 import java.math.RoundingMode.UP
 import java.text.DecimalFormat
@@ -34,6 +35,32 @@ object Extensions {
                 this.length().getFileSize()
             )
         }
+    }
+
+    fun FileObject.getIcon(packageName: String): Uri {
+        val v =  when (this.fileType) {
+            FileType.FOLDER -> {
+                Uri.parse("android.resource://$packageName/drawable/ic_folder_24")
+            }
+            FileType.TEXT -> {
+                Uri.parse("android.resource://$packageName/drawable/ic_text_24")
+            }
+            FileType.IMAGE -> {
+                Uri.fromFile(File(this.path))
+            }
+            FileType.AUDIO -> {
+                Uri.parse("android.resource://$packageName/drawable/ic_audio_24")
+            }
+            FileType.VIDEO -> {
+                Uri.fromFile(File(this.path))
+//                Uri.parse("android.resource://$packageName/drawable/ic_video_24")
+            }
+            FileType.UNKNOWN -> {
+                Uri.parse("android.resource://$packageName/drawable/ic_unknown_24")
+            }
+        }
+        println(v)
+        return v
     }
 
     fun Double.trimTwoDecimalPoint(): String {

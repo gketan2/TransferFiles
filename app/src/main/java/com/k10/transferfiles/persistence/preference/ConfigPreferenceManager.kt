@@ -28,10 +28,12 @@ class ConfigPreferenceManager @Inject constructor(
     }
 
     fun getConfigurations(): ConfigPreference {
-        return ConfigPreference.getInstance().apply {
-            showHidden = showHiddenFiles()
-            showInAccessible = showInAccessibleFiles()
-        }
+        if (configInstance == null)
+            ConfigPreference.getInstance().apply {
+                showHidden = showHiddenFiles()
+                showInAccessible = showInAccessibleFiles()
+            }
+        return configInstance!!
     }
 
     data class ConfigPreference private constructor(

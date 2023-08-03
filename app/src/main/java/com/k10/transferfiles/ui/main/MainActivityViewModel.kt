@@ -8,7 +8,6 @@ import com.k10.transferfiles.models.FileListObject
 import com.k10.transferfiles.models.FileObject
 import com.k10.transferfiles.models.mapper.FileObjectMapper
 import com.k10.transferfiles.persistence.preference.ConfigPreferenceManager
-import com.k10.transferfiles.utils.Extensions.print
 import com.k10.transferfiles.utils.FileOperations
 import com.k10.transferfiles.utils.FileType
 import com.k10.transferfiles.utils.ResultWrapper
@@ -72,7 +71,7 @@ class MainActivityViewModel @Inject constructor(
 
                     result.add(data)
                 }
-                result.print()
+//                result.print()
                 _fileListLiveData.postValue(ResultWrapper.success(FileListObject(path, result)))
                 //current path is also stored in live data, but is stored in variable to access directly in code
                 currentPath = File(path).canonicalPath
@@ -91,6 +90,7 @@ class MainActivityViewModel @Inject constructor(
     //change to configPreference object once all options decided
     fun setShowHiddenFiles(showHidden: Boolean) {
         configPreferenceManager.setShowHiddenFiles(showHidden)
+        getFilesInPath(currentPath)
     }
 
     fun getShowHiddenFiles() = configPreferenceManager.getConfigurations().showHidden

@@ -5,9 +5,10 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.k10.transferfiles.R
+import com.bumptech.glide.Glide
 import com.k10.transferfiles.databinding.ListFileBinding
 import com.k10.transferfiles.models.FileObject
+import com.k10.transferfiles.utils.Extensions.getIcon
 
 class FileListAdapter(private val communicator: FileListCommunicator) :
     RecyclerView.Adapter<FileListViewHolder>() {
@@ -19,8 +20,8 @@ class FileListAdapter(private val communicator: FileListCommunicator) :
         }
 
         override fun areContentsTheSame(oldItem: FileObject, newItem: FileObject): Boolean {
-            return false
-            //return oldItem.equals(newItem)
+            return oldItem.name == newItem.name &&
+                    oldItem.fileType == newItem.fileType
         }
 
     }
@@ -57,7 +58,10 @@ class FileListViewHolder(
 ) : RecyclerView.ViewHolder(binding.root) {
     fun bind(fileObject: FileObject) {
         binding.fileName.text = fileObject.name
-        binding.fileIcon.setImageResource(if (fileObject.isFolder) R.drawable.ic_folder else R.drawable.ic_launcher_foreground)
+        binding.fileSize.text = fileObject.formattedSize
+        Glide.with(binding.root.context)
+            .load(fileObject.getIcon(binding.root.context.packageName))
+            .into(binding.fileIcon)
         binding.root.setOnClickListener {
             if (fileObject.isFolder)
                 communicator.onFolderClick(fileObject)
