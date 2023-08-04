@@ -20,8 +20,9 @@ class FileListAdapter(private val communicator: FileListCommunicator) :
         }
 
         override fun areContentsTheSame(oldItem: FileObject, newItem: FileObject): Boolean {
-            return oldItem.name == newItem.name &&
-                    oldItem.fileType == newItem.fileType
+            return oldItem.name == newItem.name
+                    && oldItem.fileType == newItem.fileType
+                    && oldItem.path == newItem.path
         }
 
     }

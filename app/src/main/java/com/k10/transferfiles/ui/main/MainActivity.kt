@@ -3,6 +3,7 @@ package com.k10.transferfiles.ui.main
 import android.os.Bundle
 import android.view.Menu
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.switchmaterial.SwitchMaterial
@@ -35,15 +36,19 @@ class MainActivity : BaseActivity(), FileListCommunicator {
                 ResultStatus.LOADING -> {
                     binding.progressBar.visible = true
                 }
+
                 ResultStatus.SUCCESS -> {
                     binding.progressBar.visible = false
                     fileListAdapter.submitList(it.data?.files!!)
                 }
+
                 ResultStatus.FAILED -> {
                     binding.progressBar.visible = false
                 }
             }
         }
+
+        onBackPressedDispatcher.addCallback(onBackPressedCallback)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -69,7 +74,7 @@ class MainActivity : BaseActivity(), FileListCommunicator {
     }
 
     override fun onFolderClick(fileObject: FileObject) {
-        if(fileObject.isAccessible)
+        if (fileObject.isAccessible)
             viewModel.getFilesInPath(fileObject.path)
         else
             Toast.makeText(this, "Can not access this folder.", Toast.LENGTH_SHORT).show()
@@ -78,21 +83,24 @@ class MainActivity : BaseActivity(), FileListCommunicator {
     override fun onFileClick(fileObject: FileObject) {
     }
 
-    var backOnce = false
-
-    override fun onBackPressed() {
-        if (!viewModel.onBackPress()) {
-            if (backOnce)
-                super.onBackPressed()
-            else {
-                backOnce = true
-                Toast.makeText(this, "Press again to exit!", Toast.LENGTH_SHORT).show()
-                Timer().schedule(object : TimerTask() {
-                    override fun run() {
-                        backOnce = false
-                    }
-                }, 1000)
+    private val onBackPressedCallback: OnBackPressedCallback =
+        object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                handleBackPressed()
             }
+        }
+
+    private fun handleBackPressed() {
+        if (!viewModel.onBackPress()) {
+            //viewmodel has not handeled back press
+            onBackPressedCallback.isEnabled = false
+            Toast.makeText(this@MainActivity, "Press again to exit!", Toast.LENGTH_SHORT).show()
+            Timer().schedule(object : TimerTask() {
+                override fun run() {
+                    //backOnce = false
+                    onBackPressedCallback.isEnabled = true
+                }
+            }, 1000)
         }
     }
 
