@@ -1,15 +1,20 @@
 package com.k10.transferfiles.ui.main
 
+import android.graphics.Typeface.BOLD
 import android.os.Bundle
+import android.util.TypedValue
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.AdapterView
 import android.widget.AdapterView.OnItemSelectedListener
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
+import androidx.annotation.ColorInt
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.flexbox.FlexDirection
 import com.k10.transferfiles.R
 import com.k10.transferfiles.databinding.ActivityMainBinding
 import com.k10.transferfiles.models.FileObject
@@ -19,6 +24,7 @@ import com.k10.transferfiles.utils.SortType
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.Timer
 import java.util.TimerTask
+
 
 @AndroidEntryPoint
 class MainActivity : BaseActivity(), FileListCommunicator {
@@ -32,6 +38,7 @@ class MainActivity : BaseActivity(), FileListCommunicator {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        binding.pathFlexBox.flexDirection = FlexDirection.ROW
         setUpRecycler()
         viewModel.getFilesInPath()
         viewModel.fileListLiveData.observe(this) {
@@ -42,7 +49,9 @@ class MainActivity : BaseActivity(), FileListCommunicator {
 
                 ResultStatus.SUCCESS -> {
                     //binding.progressBar.visible = false
+                    binding.pathFlexBox.removeAllViews()
                     fileListAdapter.submitList(it.data?.files!!)
+                    setupPathBreakUpView(it.data.pathList)
                     if (it.data.files.size == 1) {
                         binding.itemCountText.text =
                             getString(R.string.item_in_total, it.data.files.size)
@@ -61,8 +70,13 @@ class MainActivity : BaseActivity(), FileListCommunicator {
         SortingOptionAdapter(this, SortType.getSortOptions()).apply {
             binding.sortSpinner.adapter = this
         }
-        binding.sortSpinner.onItemSelectedListener = object: OnItemSelectedListener{
-            override fun onItemSelected(adapterView: AdapterView<*>?, view: View?, position: Int, id: Long) {
+        binding.sortSpinner.onItemSelectedListener = object : OnItemSelectedListener {
+            override fun onItemSelected(
+                adapterView: AdapterView<*>?,
+                view: View?,
+                position: Int,
+                id: Long
+            ) {
                 viewModel.setSortingType(SortType.getSortOptions()[position])
             }
 
@@ -104,6 +118,62 @@ class MainActivity : BaseActivity(), FileListCommunicator {
             layoutManager = LinearLayoutManager(context)
             adapter = fileListAdapter
         }
+    }
+
+    private fun setupPathBreakUpView(pathBreakUpList: List<String>) {
+        binding.pathFlexBox.removeAllViews()
+        pathBreakUpList.forEachIndexed { index, string ->
+            if (index == 0) {
+                //add root
+                val tv = TextView(this).apply {
+                    text = "Device Storage"
+                    textSize = 12f
+                    setTypeface(typeface, BOLD)
+                    if (index == pathBreakUpList.size - 1) {
+                        val typedValue = TypedValue()
+                        theme.resolveAttribute(R.attr.colorPrimary, typedValue, true)
+                        @ColorInt val color: Int = typedValue.data
+                        setTextColor(color)
+                    }
+                    setOnClickListener {
+                        openFileFromList(pathBreakUpList, index)
+                    }
+                }
+                binding.pathFlexBox.addView(tv)
+            } else {
+                //add arrow, textview
+                val tvPartition = TextView(this).apply {
+                    text = " > "
+                    textSize = 12f
+                    setTypeface(typeface, BOLD)
+                }
+                val tv = TextView(this).apply {
+                    text = string
+                    textSize = 12f
+                    setTypeface(typeface, BOLD)
+                    if (index == pathBreakUpList.size - 1) {
+                        val typedValue = TypedValue()
+                        theme.resolveAttribute(R.attr.colorPrimary, typedValue, true)
+                        @ColorInt val color: Int = typedValue.data
+                        setTextColor(color)
+                    }
+                    setOnClickListener {
+                        openFileFromList(pathBreakUpList, index)
+                    }
+                }
+                binding.pathFlexBox.addView(tvPartition)
+                binding.pathFlexBox.addView(tv)
+            }
+        }
+    }
+
+    private fun openFileFromList(pathBreakupList: List<String>, position: Int) {
+        // make path
+        var path = viewModel.rootPath
+        for (i in 1..position) {
+            path += "/${pathBreakupList[i]}"
+        }
+        viewModel.getFilesInPath(path)
     }
 
     override fun onFolderClick(fileObject: FileObject) {

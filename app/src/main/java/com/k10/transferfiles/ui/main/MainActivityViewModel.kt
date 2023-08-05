@@ -21,7 +21,7 @@ import javax.inject.Named
 
 @HiltViewModel
 class MainActivityViewModel @Inject constructor(
-    @Named("root_path") private val rootPath: String,
+    @Named("root_path") val rootPath: String,
     private val configPreferenceManager: ConfigPreferenceManager
 ) : ViewModel() {
 

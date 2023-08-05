@@ -5,4 +5,8 @@
 
     <attr name="primaryTextSize" format="dimension"/>
     <attr name="secondaryTextSize" format="dimension"/>
+
+    <attr name="colorPrimary" format="color" />
+    <attr name="colorSecondary" format="color" />
+
 </resources>
