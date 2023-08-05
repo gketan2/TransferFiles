@@ -9,6 +9,7 @@ import com.bumptech.glide.Glide
 import com.k10.transferfiles.databinding.ItemFileBinding
 import com.k10.transferfiles.models.FileObject
 import com.k10.transferfiles.utils.Extensions.getIcon
+import com.k10.transferfiles.utils.Extensions.visible
 
 class FileListAdapter(private val communicator: FileListCommunicator) :
     RecyclerView.Adapter<FileListViewHolder>() {
@@ -30,7 +31,7 @@ class FileListAdapter(private val communicator: FileListCommunicator) :
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FileListViewHolder {
         return FileListViewHolder(
-            ItemFileBinding.inflate(LayoutInflater.from(parent.context)),
+            ItemFileBinding.inflate(LayoutInflater.from(parent.context), parent, false),
             communicator
         )
     }
@@ -60,6 +61,7 @@ class FileListViewHolder(
     fun bind(fileObject: FileObject) {
         binding.fileName.text = fileObject.name
         binding.fileSize.text = "${fileObject.formattedSize} | ${fileObject.lastModifiedFormatted}"
+        binding.fileSelectedCheckBox.visible = !fileObject.isFolder
         Glide.with(binding.root.context)
             .load(fileObject.getIcon(binding.root.context.packageName))
             .into(binding.fileIcon)
@@ -68,6 +70,8 @@ class FileListViewHolder(
                 communicator.onFolderClick(fileObject)
             else
                 communicator.onFileClick(fileObject)
+        }
+        binding.fileSelectedCheckBox.setOnCheckedChangeListener { _, checked ->
         }
     }
 }

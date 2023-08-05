@@ -75,7 +75,7 @@ class MainActivityViewModel @Inject constructor(
                 //current path is also stored in live data, but is stored in variable to access directly in code
                 currentPath = File(path).canonicalPath
 
-                _fileListLiveData.postValue(ResultWrapper.success(FileListObject(currentPath, result)))
+                _fileListLiveData.postValue(ResultWrapper.success(FileListObject(currentPath.removePrefix(rootPath).split("/"),currentPath, result)))
             } else {
                 //not a folder or no read access
                 _fileListLiveData.postValue(

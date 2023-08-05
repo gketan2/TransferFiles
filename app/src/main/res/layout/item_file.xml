@@ -15,22 +15,37 @@
 
     <TextView
         android:id="@+id/fileName"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:gravity="start"
+        android:maxLines="2"
         android:textColor="?attr/primaryTextColor"
         android:textSize="?attr/primaryTextSize"
+        app:layout_constraintEnd_toStartOf="@id/fileSelectedCheckBox"
         app:layout_constraintStart_toEndOf="@id/fileIcon"
-        app:layout_constraintTop_toTopOf="@id/fileIcon"
-        tools:text="File Name" />
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="File Name  wejn oj wef owen olejwfojw efnd fnoewnjofn.pdf" />
 
     <TextView
         android:id="@+id/fileSize"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:gravity="start"
         android:textColor="?attr/secondaryTextColor"
         android:textSize="?attr/secondaryTextSize"
-        app:layout_constraintStart_toEndOf="@id/fileIcon"
+        app:layout_constraintEnd_toEndOf="@id/fileName"
+        app:layout_constraintStart_toStartOf="@id/fileName"
         app:layout_constraintTop_toBottomOf="@id/fileName"
         tools:text="size | time" />
+
+    <androidx.appcompat.widget.AppCompatCheckBox
+        android:id="@+id/fileSelectedCheckBox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

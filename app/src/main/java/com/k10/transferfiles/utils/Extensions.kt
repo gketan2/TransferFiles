@@ -56,6 +56,18 @@ object Extensions {
                 Uri.parse("android.resource://$packageName/drawable/ic_text_24")
             }
 
+            FileType.PDF -> {
+                Uri.parse("android.resource://$packageName/drawable/ic_pdf_24")
+            }
+
+            FileType.DOC -> {
+                Uri.parse("android.resource://$packageName/drawable/ic_doc_24")
+            }
+
+            FileType.EXCEL -> {
+                Uri.parse("android.resource://$packageName/drawable/ic_xls_24")
+            }
+
             FileType.IMAGE -> {
                 Uri.fromFile(File(this.path))
             }

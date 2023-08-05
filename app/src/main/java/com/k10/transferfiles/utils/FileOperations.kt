@@ -29,7 +29,8 @@ object FileOperations {
                 return Pair(fileName.substring(1, fileName.length), "")
             } else {
                 return Pair(
-                    fileName.substring(1, extslayer),
+//                    fileName.substring(1, extslayer),
+                    fileName,
                     fileName.substring(extslayer + 1, fileName.length)
                 )
             }
@@ -42,7 +43,8 @@ object FileOperations {
                 Pair(fileName, "")
             } else {
                 Pair(
-                    fileName.substring(0, extslayer),
+//                    fileName.substring(0, extslayer),
+                    fileName,
                     fileName.substring(extslayer + 1, fileName.length)
                 )
             }
