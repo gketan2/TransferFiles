@@ -48,16 +48,14 @@ class MainActivityViewModel @Inject constructor(
                 val result: ArrayList<FileObject> = ArrayList()
 
                 //adding ..
-                if (path != rootPath) {
+                if (false && path != rootPath) {
                     result.add(
-                        FileObject("..", "", FileType.UNKNOWN, "$path/..", true, 0, "")
+                        FileObject("..", "", FileType.UNKNOWN, "$path/..", true, 0, "", 0, "")
                     )
                 }
 
                 val configs = configPreferenceManager.getConfigurations()
 
-                //sort according to preference
-                files.sortWith(FileOperations.getComparatorForFileSorting(SortType.HIDDEN))
                 for (i in files.indices) {
                     //skipping hidden files based on preference
                     if (!configs.showHidden && files[i].isHidden)
@@ -71,10 +69,13 @@ class MainActivityViewModel @Inject constructor(
 
                     result.add(data)
                 }
-//                result.print()
-                _fileListLiveData.postValue(ResultWrapper.success(FileListObject(path, result)))
+                //sort according to preference
+                result.sortWith(FileOperations.getComparatorForFileSorting(getSortingType()))
+
                 //current path is also stored in live data, but is stored in variable to access directly in code
                 currentPath = File(path).canonicalPath
+
+                _fileListLiveData.postValue(ResultWrapper.success(FileListObject(currentPath, result)))
             } else {
                 //not a folder or no read access
                 _fileListLiveData.postValue(
@@ -94,6 +95,13 @@ class MainActivityViewModel @Inject constructor(
     }
 
     fun getShowHiddenFiles() = configPreferenceManager.getConfigurations().showHidden
+
+    fun setSortingType(sortType: SortType) {
+        configPreferenceManager.setSortType(sortType)
+        getFilesInPath(currentPath)
+    }
+
+    fun getSortingType() = configPreferenceManager.getConfigurations().sortingType
 
     /**
      * Shows files in parent folder, if it is root path,

@@ -2,6 +2,7 @@ package com.k10.transferfiles.persistence.preference
 
 import android.content.SharedPreferences
 import com.k10.transferfiles.utils.Constants.CONFIG_PREFERENCE
+import com.k10.transferfiles.utils.SortType
 import javax.inject.Inject
 import javax.inject.Named
 
@@ -27,18 +28,29 @@ class ConfigPreferenceManager @Inject constructor(
         return sharedPreferences.edit().putBoolean(SHOW_INACCESSIBLE_FILES, show).apply()
     }
 
+    fun setSortType(sortType: SortType) {
+        configInstance?.sortingType = sortType
+        sharedPreferences.edit().putInt(SORT_TYPE, sortType.type).apply()
+    }
+
+    private fun getSortType(): SortType {
+        return SortType.getByType(sharedPreferences.getInt(SORT_TYPE, 0))
+    }
+
     fun getConfigurations(): ConfigPreference {
         if (configInstance == null)
             ConfigPreference.getInstance().apply {
                 showHidden = showHiddenFiles()
                 showInAccessible = showInAccessibleFiles()
+                sortingType = getSortType()
             }
         return configInstance!!
     }
 
     data class ConfigPreference private constructor(
         var showHidden: Boolean = true,
-        var showInAccessible: Boolean = true
+        var showInAccessible: Boolean = true,
+        var sortingType: SortType = SortType.LAST_MODIFIED
     ) {
         companion object {
             fun getInstance(): ConfigPreference {
@@ -53,5 +65,6 @@ class ConfigPreferenceManager @Inject constructor(
         private var configInstance: ConfigPreference? = null
         private const val SHOW_HIDDEN_FILES = "SHOW_HIDDEN_FILES"
         private const val SHOW_INACCESSIBLE_FILES = "SHOW_INACCESSIBLE_FILES"
+        private const val SORT_TYPE = "SORT_TYPE"
     }
 }

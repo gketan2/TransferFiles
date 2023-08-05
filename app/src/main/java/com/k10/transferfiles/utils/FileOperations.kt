@@ -1,5 +1,6 @@
 package com.k10.transferfiles.utils
 
+import com.k10.transferfiles.models.FileObject
 import java.io.File
 
 object FileOperations {
@@ -53,33 +54,57 @@ object FileOperations {
     fun getComparatorForFileSorting(
         sortType: SortType,
         reverse: Boolean = false
-    ): Comparator<File> {
+    ): Comparator<FileObject> {
         return when (sortType) {
-            SortType.HIDDEN -> {
-                Comparator { o1, o2 ->
-                    if (reverse) {
-                        if (o1.isHidden && o2.isHidden) 0 else if (!o1.isHidden && !o2.isHidden) 0 else if (o1.isHidden) -1 else 1
-                    } else {
-                        if (o1.isHidden && o2.isHidden) 0 else if (!o1.isHidden && !o2.isHidden) 0 else if (o1.isHidden) 1 else -1
-                    }
-                }
-            }
             SortType.LAST_MODIFIED -> {
                 Comparator { o1, o2 ->
-                    if (reverse) o2.lastModified().compareTo(o1.lastModified())
-                    else o1.lastModified().compareTo(o2.lastModified())
+                    if (o2.isFolder && o1.isFolder) {
+                        // do sort
+                        if (reverse) o2.lastModified.compareTo(o1.lastModified)
+                        else o1.lastModified.compareTo(o2.lastModified)
+                    } else if (!o2.isFolder && !o1.isFolder) {
+                        // do sort
+                        if (reverse) o2.lastModified.compareTo(o1.lastModified)
+                        else o1.lastModified.compareTo(o2.lastModified)
+                    } else {
+                        // priority to folder
+                        val multiplier = if (reverse) -1 else 1
+                        if (o1.isFolder) -1*multiplier else 1*multiplier
+                    }
                 }
             }
             SortType.SIZE -> {
                 Comparator { o1, o2 ->
-                    if (reverse) o2.length().compareTo(o1.length())
-                    else o1.length().compareTo(o2.length())
+                    if (o2.isFolder && o1.isFolder) {
+                        // do sort
+                        if (reverse) o2.size.compareTo(o1.size)
+                        else o1.size.compareTo(o2.size)
+                    } else if (!o2.isFolder && !o1.isFolder) {
+                        // do sort
+                        if (reverse) o2.size.compareTo(o1.size)
+                        else o1.size.compareTo(o2.size)
+                    } else {
+                        // priority to folder
+                        val multiplier = if (reverse) -1 else 1
+                        if (o1.isFolder) -1*multiplier else 1*multiplier
+                    }
                 }
             }
             SortType.NAME -> {
                 Comparator { o1, o2 ->
-                    if (reverse) o2.nameWithoutExtension.compareTo(o1.nameWithoutExtension)
-                    else o1.nameWithoutExtension.compareTo(o2.nameWithoutExtension)
+                    if (o2.isFolder && o1.isFolder) {
+                        // do sort
+                        if (reverse) o2.name.compareTo(o1.name)
+                        else o1.name.compareTo(o2.name)
+                    } else if (!o2.isFolder && !o1.isFolder) {
+                        // do sort
+                        if (reverse) o2.name.compareTo(o1.name)
+                        else o1.name.compareTo(o2.name)
+                    } else {
+                        // priority to folder
+                        val multiplier = if (reverse) -1 else 1
+                        if (o1.isFolder) -1*multiplier else 1*multiplier
+                    }
                 }
             }
         }

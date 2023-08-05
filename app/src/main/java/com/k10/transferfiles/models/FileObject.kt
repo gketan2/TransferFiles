@@ -10,6 +10,8 @@ data class FileObject(
     val isFolder: Boolean,
     val size: Long,
     val formattedSize: String,
+    val lastModified: Long,
+    val lastModifiedFormatted: String,
     val isHidden: Boolean = false,
     val isAccessible: Boolean = true
 )
