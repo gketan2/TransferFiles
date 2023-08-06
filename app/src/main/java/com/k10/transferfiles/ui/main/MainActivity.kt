@@ -18,6 +18,7 @@ import com.k10.transferfiles.R
 import com.k10.transferfiles.databinding.ActivityMainBinding
 import com.k10.transferfiles.models.FileObject
 import com.k10.transferfiles.ui.BaseActivity
+import com.k10.transferfiles.utils.Extensions.visible
 import com.k10.transferfiles.utils.ResultStatus
 import com.k10.transferfiles.utils.SortType
 import dagger.hilt.android.AndroidEntryPoint
@@ -47,10 +48,14 @@ class MainActivity : BaseActivity(), FileListCommunicator {
                     binding.pathBreakup.removeAllViews()
                     fileListAdapter.submitList(it.data?.files!!)
                     setupPathBreakUpView(it.data.pathList)
+                    binding.noViewsLayout.root.visible = false
                     if (it.data.files.size == 1) {
                         binding.itemCountText.text =
                             getString(R.string.item_in_total, it.data.files.size)
                     } else {
+                        if (it.data.files.isEmpty()) {
+                            binding.noViewsLayout.root.visible = true
+                        }
                         binding.itemCountText.text =
                             getString(R.string.items_in_total, it.data.files.size)
                     }
