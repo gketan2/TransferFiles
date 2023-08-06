@@ -17,6 +17,7 @@
         <item name="primaryTextSize">16sp</item>
         <item name="secondaryTextSize">12sp</item>
 
+        <item name="fontFamily">@font/nunito</item>
 
     </style>
 

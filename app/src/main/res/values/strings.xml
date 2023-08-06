@@ -11,4 +11,6 @@
 
     <string name="item_in_total">%d item in total</string>
     <string name="items_in_total">%d items in total</string>
+
+    <string name="no_files">No files</string>
 </resources>

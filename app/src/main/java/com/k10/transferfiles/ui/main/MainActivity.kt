@@ -14,7 +14,6 @@ import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.annotation.ColorInt
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.google.android.flexbox.FlexDirection
 import com.k10.transferfiles.R
 import com.k10.transferfiles.databinding.ActivityMainBinding
 import com.k10.transferfiles.models.FileObject
@@ -24,7 +23,6 @@ import com.k10.transferfiles.utils.SortType
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.Timer
 import java.util.TimerTask
-
 
 @AndroidEntryPoint
 class MainActivity : BaseActivity(), FileListCommunicator {
@@ -38,18 +36,15 @@ class MainActivity : BaseActivity(), FileListCommunicator {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        binding.pathFlexBox.flexDirection = FlexDirection.ROW
         setUpRecycler()
         viewModel.getFilesInPath()
         viewModel.fileListLiveData.observe(this) {
             when (it.status) {
                 ResultStatus.LOADING -> {
-                    //binding.progressBar.visible = true
                 }
 
                 ResultStatus.SUCCESS -> {
-                    //binding.progressBar.visible = false
-                    binding.pathFlexBox.removeAllViews()
+                    binding.pathBreakup.removeAllViews()
                     fileListAdapter.submitList(it.data?.files!!)
                     setupPathBreakUpView(it.data.pathList)
                     if (it.data.files.size == 1) {
@@ -62,7 +57,6 @@ class MainActivity : BaseActivity(), FileListCommunicator {
                 }
 
                 ResultStatus.FAILED -> {
-                    //binding.progressBar.visible = false
                 }
             }
         }
@@ -121,7 +115,7 @@ class MainActivity : BaseActivity(), FileListCommunicator {
     }
 
     private fun setupPathBreakUpView(pathBreakUpList: List<String>) {
-        binding.pathFlexBox.removeAllViews()
+        binding.pathBreakup.removeAllViews()
         pathBreakUpList.forEachIndexed { index, string ->
             if (index == 0) {
                 //add root
@@ -129,7 +123,7 @@ class MainActivity : BaseActivity(), FileListCommunicator {
                     text = "Device Storage"
                     textSize = 12f
                     setTypeface(typeface, BOLD)
-                    if (index == pathBreakUpList.size - 1) {
+                    if (pathBreakUpList.size == 1) {
                         val typedValue = TypedValue()
                         theme.resolveAttribute(R.attr.colorPrimary, typedValue, true)
                         @ColorInt val color: Int = typedValue.data
@@ -139,7 +133,7 @@ class MainActivity : BaseActivity(), FileListCommunicator {
                         openFileFromList(pathBreakUpList, index)
                     }
                 }
-                binding.pathFlexBox.addView(tv)
+                binding.pathBreakup.addView(tv)
             } else {
                 //add arrow, textview
                 val tvPartition = TextView(this).apply {
@@ -161,8 +155,8 @@ class MainActivity : BaseActivity(), FileListCommunicator {
                         openFileFromList(pathBreakUpList, index)
                     }
                 }
-                binding.pathFlexBox.addView(tvPartition)
-                binding.pathFlexBox.addView(tv)
+                binding.pathBreakup.addView(tvPartition)
+                binding.pathBreakup.addView(tv)
             }
         }
     }

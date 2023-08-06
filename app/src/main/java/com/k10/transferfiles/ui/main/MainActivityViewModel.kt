@@ -35,8 +35,7 @@ class MainActivityViewModel @Inject constructor(
      * Include Sorting and Filtering hidden files based on config in shared preference.
      * Which can be updated by user through UI.
      *
-     * @param  path
-     *         path of directory to get file list
+     * @param  path path of directory to get file list
      */
     fun getFilesInPath(path: String = currentPath) {
         viewModelScope.launch(IO) {
