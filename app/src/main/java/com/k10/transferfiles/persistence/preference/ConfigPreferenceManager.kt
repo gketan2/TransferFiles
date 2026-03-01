@@ -5,7 +5,10 @@ import com.k10.transferfiles.utils.Constants.CONFIG_PREFERENCE
 import com.k10.transferfiles.utils.SortType
 import javax.inject.Inject
 import javax.inject.Named
+import javax.inject.Singleton
+import androidx.core.content.edit
 
+@Singleton
 class ConfigPreferenceManager @Inject constructor(
     @Named(CONFIG_PREFERENCE) private val sharedPreferences: SharedPreferences
 ) {
@@ -16,7 +19,7 @@ class ConfigPreferenceManager @Inject constructor(
 
     fun setShowHiddenFiles(show: Boolean) {
         configInstance?.showHidden = show
-        return sharedPreferences.edit().putBoolean(SHOW_HIDDEN_FILES, show).apply()
+        return sharedPreferences.edit() { putBoolean(SHOW_HIDDEN_FILES, show) }
     }
 
     private fun showInAccessibleFiles(): Boolean {
@@ -25,12 +28,12 @@ class ConfigPreferenceManager @Inject constructor(
 
     fun setShowInAccessibleFiles(show: Boolean) {
         configInstance?.showInAccessible = show
-        return sharedPreferences.edit().putBoolean(SHOW_INACCESSIBLE_FILES, show).apply()
+        return sharedPreferences.edit() { putBoolean(SHOW_INACCESSIBLE_FILES, show) }
     }
 
     fun setSortType(sortType: SortType) {
         configInstance?.sortingType = sortType
-        sharedPreferences.edit().putInt(SORT_TYPE, sortType.type).apply()
+        sharedPreferences.edit() { putInt(SORT_TYPE, sortType.type) }
     }
 
     private fun getSortType(): SortType {
