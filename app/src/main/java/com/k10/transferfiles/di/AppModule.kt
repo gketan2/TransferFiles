@@ -3,6 +3,8 @@ package com.k10.transferfiles.di
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.Environment
+import com.k10.transferfiles.persistence.proto.factories.provideUiConfigsDataStoreFactory
+import com.k10.transferfiles.persistence.proto.managers.UiConfigsManager
 import com.k10.transferfiles.utils.Constants.CONFIG_PREFERENCE
 import dagger.Module
 import dagger.Provides
@@ -24,6 +26,13 @@ class AppModule {
     @Named(CONFIG_PREFERENCE)
     fun getSharedPreference(@ApplicationContext context: Context): SharedPreferences {
         return context.getSharedPreferences(CONFIG_PREFERENCE, Context.MODE_PRIVATE)
+    }
+
+    @Provides
+    fun provideUiConfigsManager(
+        @ApplicationContext context: Context,
+    ): UiConfigsManager {
+        return UiConfigsManager(provideUiConfigsDataStoreFactory(context))
     }
 
 }

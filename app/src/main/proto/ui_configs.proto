@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+option java_package = "com.k10.transferfiles.proto";
+option java_multiple_files = true;
+
+message UiConfigs {
+  bool show_hidden_files = 1;
+  bool show_inaccessible_files = 2;
+
+  enum SortType {
+    LAST_MODIFIED = 0;
+    SIZE = 1;
+    NAME = 2;
+  }
+
+  SortType sort_type = 3;
+}

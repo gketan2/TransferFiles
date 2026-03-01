@@ -7,13 +7,16 @@ import androidx.lifecycle.viewModelScope
 import com.k10.transferfiles.models.FileListObject
 import com.k10.transferfiles.models.FileObject
 import com.k10.transferfiles.models.mapper.FileObjectMapper
+import com.k10.transferfiles.models.mapper.toProtoSortType
+import com.k10.transferfiles.models.mapper.toSortType
 import com.k10.transferfiles.persistence.preference.ConfigPreferenceManager
+import com.k10.transferfiles.persistence.proto.managers.UiConfigsManager
 import com.k10.transferfiles.utils.FileOperations
 import com.k10.transferfiles.utils.FileType
 import com.k10.transferfiles.utils.ResultWrapper
 import com.k10.transferfiles.utils.SortType
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.io.File
 import javax.inject.Inject
@@ -22,7 +25,7 @@ import javax.inject.Named
 @HiltViewModel
 class MainActivityViewModel @Inject constructor(
     @Named("root_path") val rootPath: String,
-    private val configPreferenceManager: ConfigPreferenceManager
+    private val uiConfigManager: UiConfigsManager,
 ) : ViewModel() {
 
     private var currentPath = rootPath
@@ -38,7 +41,7 @@ class MainActivityViewModel @Inject constructor(
      * @param  path path of directory to get file list
      */
     fun getFilesInPath(path: String = currentPath) {
-        viewModelScope.launch(IO) {
+        viewModelScope.launch(Dispatchers.IO) {
 
             _fileListLiveData.postValue(ResultWrapper.loading(_fileListLiveData.value?.data))
 
@@ -53,23 +56,23 @@ class MainActivityViewModel @Inject constructor(
                     )
                 }
 
-                val configs = configPreferenceManager.getConfigurations()
+                val configs = uiConfigManager.getConfig()
 
                 for (i in files.indices) {
                     //skipping hidden files based on preference
-                    if (!configs.showHidden && files[i].isHidden)
+                    if (!configs.showHiddenFiles && files[i].isHidden)
                         continue
 
-                    val data = FileObjectMapper.fileToFileObject(files[i], configs.showHidden)
+                    val data = FileObjectMapper.fileToFileObject(files[i], configs.showHiddenFiles)
 
                     //skipping inaccessible files based on preference
-                    if (!configs.showInAccessible && !data.isAccessible)
+                    if (!configs.showInaccessibleFiles && !data.isAccessible)
                         continue
 
                     result.add(data)
                 }
                 //sort according to preference
-                result.sortWith(FileOperations.getComparatorForFileSorting(getSortingType()))
+                result.sortWith(FileOperations.getComparatorForFileSorting(configs.sortType.toSortType()))
 
                 //current path is also stored in live data, but is stored in variable to access directly in code
                 currentPath = File(path).canonicalPath
@@ -89,18 +92,18 @@ class MainActivityViewModel @Inject constructor(
 
     //change to configPreference object once all options decided
     fun setShowHiddenFiles(showHidden: Boolean) {
-        configPreferenceManager.setShowHiddenFiles(showHidden)
-        getFilesInPath(currentPath)
+        viewModelScope.launch {
+            uiConfigManager.updateShowHiddenFiles(showHidden)
+            getFilesInPath(currentPath)
+        }
     }
-
-    fun getShowHiddenFiles() = configPreferenceManager.getConfigurations().showHidden
 
     fun setSortingType(sortType: SortType) {
-        configPreferenceManager.setSortType(sortType)
-        getFilesInPath(currentPath)
+        viewModelScope.launch {
+            uiConfigManager.updateSortType(sortType.toProtoSortType())
+            getFilesInPath(currentPath)
+        }
     }
-
-    fun getSortingType() = configPreferenceManager.getConfigurations().sortingType
 
     /**
      * Shows files in parent folder, if it is root path,
