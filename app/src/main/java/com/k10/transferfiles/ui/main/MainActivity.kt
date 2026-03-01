@@ -82,7 +82,7 @@ class MainActivity : BaseActivity(), FileListCommunicator {
             override fun onNothingSelected(p0: AdapterView<*>?) {
             }
         }
-        binding.sortSpinner.setSelection(viewModel.getSortingType().type)
+//        binding.sortSpinner.setSelection(viewModel.getSortingType().type)
 
         onBackPressedDispatcher.addCallback(onBackPressedCallback)
     }
@@ -94,7 +94,7 @@ class MainActivity : BaseActivity(), FileListCommunicator {
 
     override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
         val hiddenItem = menu?.findItem(R.id.hiddenFiles)
-        hiddenItem?.isChecked = viewModel.getShowHiddenFiles()
+//        hiddenItem?.isChecked = viewModel.getShowHiddenFiles()
         return true
     }
 

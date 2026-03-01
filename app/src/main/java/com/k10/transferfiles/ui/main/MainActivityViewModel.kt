@@ -9,7 +9,6 @@ import com.k10.transferfiles.models.FileObject
 import com.k10.transferfiles.models.mapper.FileObjectMapper
 import com.k10.transferfiles.models.mapper.toProtoSortType
 import com.k10.transferfiles.models.mapper.toSortType
-import com.k10.transferfiles.persistence.preference.ConfigPreferenceManager
 import com.k10.transferfiles.persistence.proto.managers.UiConfigsManager
 import com.k10.transferfiles.utils.FileOperations
 import com.k10.transferfiles.utils.FileType
