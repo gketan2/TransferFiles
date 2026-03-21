@@ -2,7 +2,6 @@
 
 buildscript {
     dependencies {
-//        classpath("com.google.dagger:hilt-android-gradle-plugin:2.47")
     }
 }
 
@@ -12,7 +11,7 @@ plugins {
     id 'org.jetbrains.kotlin.android' version '2.1.0' apply false
     id 'com.google.dagger.hilt.android' version '2.51.1' apply false
     id "com.google.protobuf" version "0.9.3" apply false
-
+    id "org.jetbrains.kotlin.plugin.compose" version "2.1.0" apply false
 }
 
 ext {

@@ -1,87 +1,74 @@
 package com.k10.transferfiles.ui.main
 
-import android.graphics.Typeface.BOLD
 import android.os.Bundle
-import android.util.TypedValue
 import android.view.Menu
 import android.view.MenuItem
-import android.view.View
-import android.widget.AdapterView
-import android.widget.AdapterView.OnItemSelectedListener
-import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
-import androidx.annotation.ColorInt
-import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.compose.ui.platform.ComposeView
 import com.k10.transferfiles.R
-import com.k10.transferfiles.databinding.ActivityMainBinding
-import com.k10.transferfiles.models.FileObject
 import com.k10.transferfiles.ui.BaseActivity
-import com.k10.transferfiles.utils.Extensions.visible
-import com.k10.transferfiles.utils.ResultStatus
-import com.k10.transferfiles.utils.SortType
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.Timer
 import java.util.TimerTask
 
 @AndroidEntryPoint
-class MainActivity : BaseActivity(), FileListCommunicator {
+class MainActivity : BaseActivity() {
 
-    private lateinit var binding: ActivityMainBinding
-    private lateinit var fileListAdapter: FileListAdapter
     private val viewModel: MainActivityViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-
-        setUpRecycler()
+        setContentView(ComposeView(this).apply {
+            setContent {
+                MainActivityView(viewModel)
+            }
+        })
         viewModel.getFilesInPath()
-        viewModel.fileListLiveData.observe(this) {
-            when (it.status) {
-                ResultStatus.LOADING -> {
-                }
+//        viewModel.fileListLiveData.observe(this) {
+//            when (it.status) {
+//                ResultStatus.LOADING -> {
+//                }
+//
+//                ResultStatus.SUCCESS -> {
+//                    binding.pathBreakup.removeAllViews()
+//                    fileListAdapter.submitList(it.data?.files!!)
+//                    setupPathBreakUpView(it.data.pathList)
+//                    binding.noViewsLayout.root.visible = false
+//                    if (it.data.files.size == 1) {
+//                        binding.itemCountText.text =
+//                            getString(R.string.item_in_total, it.data.files.size)
+//                    } else {
+//                        if (it.data.files.isEmpty()) {
+//                            binding.noViewsLayout.root.visible = true
+//                        }
+//                        binding.itemCountText.text =
+//                            getString(R.string.items_in_total, it.data.files.size)
+//                    }
+//                }
+//
+//                ResultStatus.FAILED -> {
+//                }
+//            }
+//        }
 
-                ResultStatus.SUCCESS -> {
-                    binding.pathBreakup.removeAllViews()
-                    fileListAdapter.submitList(it.data?.files!!)
-                    setupPathBreakUpView(it.data.pathList)
-                    binding.noViewsLayout.root.visible = false
-                    if (it.data.files.size == 1) {
-                        binding.itemCountText.text =
-                            getString(R.string.item_in_total, it.data.files.size)
-                    } else {
-                        if (it.data.files.isEmpty()) {
-                            binding.noViewsLayout.root.visible = true
-                        }
-                        binding.itemCountText.text =
-                            getString(R.string.items_in_total, it.data.files.size)
-                    }
-                }
-
-                ResultStatus.FAILED -> {
-                }
-            }
-        }
-
-        SortingOptionAdapter(this, SortType.getSortOptions()).apply {
-            binding.sortSpinner.adapter = this
-        }
-        binding.sortSpinner.onItemSelectedListener = object : OnItemSelectedListener {
-            override fun onItemSelected(
-                adapterView: AdapterView<*>?,
-                view: View?,
-                position: Int,
-                id: Long
-            ) {
-                viewModel.setSortingType(SortType.getSortOptions()[position])
-            }
-
-            override fun onNothingSelected(p0: AdapterView<*>?) {
-            }
-        }
+//        SortingOptionAdapter(this, SortType.getSortOptions()).apply {
+//            binding.sortSpinner.adapter = this
+//        }
+//        binding.sortSpinner.onItemSelectedListener = object : OnItemSelectedListener {
+//            override fun onItemSelected(
+//                adapterView: AdapterView<*>?,
+//                view: View?,
+//                position: Int,
+//                id: Long
+//            ) {
+//                viewModel.setSortingType(SortType.getSortOptions()[position])
+//            }
+//
+//            override fun onNothingSelected(p0: AdapterView<*>?) {
+//            }
+//        }
 //        binding.sortSpinner.setSelection(viewModel.getSortingType().type)
 
         onBackPressedDispatcher.addCallback(onBackPressedCallback)
@@ -111,60 +98,52 @@ class MainActivity : BaseActivity(), FileListCommunicator {
         }
     }
 
-    private fun setUpRecycler() {
-        fileListAdapter = FileListAdapter(this)
-        binding.fileListRecycler.apply {
-            layoutManager = LinearLayoutManager(context)
-            adapter = fileListAdapter
-        }
-    }
-
-    private fun setupPathBreakUpView(pathBreakUpList: List<String>) {
-        binding.pathBreakup.removeAllViews()
-        pathBreakUpList.forEachIndexed { index, string ->
-            if (index == 0) {
-                //add root
-                val tv = TextView(this).apply {
-                    text = "Device Storage"
-                    textSize = 12f
-                    setTypeface(typeface, BOLD)
-                    if (pathBreakUpList.size == 1) {
-                        val typedValue = TypedValue()
-                        theme.resolveAttribute(R.attr.colorPrimary, typedValue, true)
-                        @ColorInt val color: Int = typedValue.data
-                        setTextColor(color)
-                    }
-                    setOnClickListener {
-                        openFileFromList(pathBreakUpList, index)
-                    }
-                }
-                binding.pathBreakup.addView(tv)
-            } else {
-                //add arrow, textview
-                val tvPartition = TextView(this).apply {
-                    text = " > "
-                    textSize = 12f
-                    setTypeface(typeface, BOLD)
-                }
-                val tv = TextView(this).apply {
-                    text = string
-                    textSize = 12f
-                    setTypeface(typeface, BOLD)
-                    if (index == pathBreakUpList.size - 1) {
-                        val typedValue = TypedValue()
-                        theme.resolveAttribute(R.attr.colorPrimary, typedValue, true)
-                        @ColorInt val color: Int = typedValue.data
-                        setTextColor(color)
-                    }
-                    setOnClickListener {
-                        openFileFromList(pathBreakUpList, index)
-                    }
-                }
-                binding.pathBreakup.addView(tvPartition)
-                binding.pathBreakup.addView(tv)
-            }
-        }
-    }
+//    private fun setupPathBreakUpView(pathBreakUpList: List<String>) {
+//        binding.pathBreakup.removeAllViews()
+//        pathBreakUpList.forEachIndexed { index, string ->
+//            if (index == 0) {
+//                //add root
+//                val tv = TextView(this).apply {
+//                    text = "Device Storage"
+//                    textSize = 12f
+//                    setTypeface(typeface, BOLD)
+//                    if (pathBreakUpList.size == 1) {
+//                        val typedValue = TypedValue()
+//                        theme.resolveAttribute(R.attr.colorPrimary, typedValue, true)
+//                        @ColorInt val color: Int = typedValue.data
+//                        setTextColor(color)
+//                    }
+//                    setOnClickListener {
+//                        openFileFromList(pathBreakUpList, index)
+//                    }
+//                }
+//                binding.pathBreakup.addView(tv)
+//            } else {
+//                //add arrow, textview
+//                val tvPartition = TextView(this).apply {
+//                    text = " > "
+//                    textSize = 12f
+//                    setTypeface(typeface, BOLD)
+//                }
+//                val tv = TextView(this).apply {
+//                    text = string
+//                    textSize = 12f
+//                    setTypeface(typeface, BOLD)
+//                    if (index == pathBreakUpList.size - 1) {
+//                        val typedValue = TypedValue()
+//                        theme.resolveAttribute(R.attr.colorPrimary, typedValue, true)
+//                        @ColorInt val color: Int = typedValue.data
+//                        setTextColor(color)
+//                    }
+//                    setOnClickListener {
+//                        openFileFromList(pathBreakUpList, index)
+//                    }
+//                }
+//                binding.pathBreakup.addView(tvPartition)
+//                binding.pathBreakup.addView(tv)
+//            }
+//        }
+//    }
 
     private fun openFileFromList(pathBreakupList: List<String>, position: Int) {
         // make path
@@ -173,16 +152,6 @@ class MainActivity : BaseActivity(), FileListCommunicator {
             path += "/${pathBreakupList[i]}"
         }
         viewModel.getFilesInPath(path)
-    }
-
-    override fun onFolderClick(fileObject: FileObject) {
-        if (fileObject.isAccessible)
-            viewModel.getFilesInPath(fileObject.path)
-        else
-            Toast.makeText(this, "Can not access ${fileObject.name}", Toast.LENGTH_SHORT).show()
-    }
-
-    override fun onFileClick(fileObject: FileObject) {
     }
 
     private val onBackPressedCallback: OnBackPressedCallback =
@@ -199,7 +168,6 @@ class MainActivity : BaseActivity(), FileListCommunicator {
             Toast.makeText(this@MainActivity, "Press again to exit!", Toast.LENGTH_SHORT).show()
             Timer().schedule(object : TimerTask() {
                 override fun run() {
-                    //backOnce = false
                     onBackPressedCallback.isEnabled = true
                 }
             }, 1000)

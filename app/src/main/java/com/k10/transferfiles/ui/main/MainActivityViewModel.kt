@@ -1,7 +1,5 @@
 package com.k10.transferfiles.ui.main
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.k10.transferfiles.models.FileListObject
@@ -16,6 +14,8 @@ import com.k10.transferfiles.utils.ResultWrapper
 import com.k10.transferfiles.utils.SortType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.io.File
 import javax.inject.Inject
@@ -28,9 +28,9 @@ class MainActivityViewModel @Inject constructor(
 ) : ViewModel() {
 
     private var currentPath = rootPath
-    private val _fileListLiveData: MediatorLiveData<ResultWrapper<FileListObject>> =
-        MediatorLiveData()
-    val fileListLiveData: LiveData<ResultWrapper<FileListObject>> = _fileListLiveData
+    private val _fileListStateFlow: MutableStateFlow<ResultWrapper<FileListObject>> =
+        MutableStateFlow(ResultWrapper.loading(null))
+    val fileListFlow = _fileListStateFlow.asStateFlow()
 
     /**
      * Fetch the list of files in the given path and update the live data.
@@ -42,7 +42,7 @@ class MainActivityViewModel @Inject constructor(
     fun getFilesInPath(path: String = currentPath) {
         viewModelScope.launch(Dispatchers.IO) {
 
-            _fileListLiveData.postValue(ResultWrapper.loading(_fileListLiveData.value?.data))
+           _fileListStateFlow.tryEmit(ResultWrapper.loading(_fileListStateFlow.value?.data))
 
             val files = File(path).listFiles()
             if (files != null) {
@@ -76,12 +76,12 @@ class MainActivityViewModel @Inject constructor(
                 //current path is also stored in live data, but is stored in variable to access directly in code
                 currentPath = File(path).canonicalPath
 
-                _fileListLiveData.postValue(ResultWrapper.success(FileListObject(currentPath.removePrefix(rootPath).split("/"),currentPath, result)))
+                _fileListStateFlow.tryEmit(ResultWrapper.success(FileListObject(currentPath.removePrefix(rootPath).split("/"),currentPath, result)))
             } else {
                 //not a folder or no read access
-                _fileListLiveData.postValue(
+                _fileListStateFlow.tryEmit(
                     ResultWrapper.failed(
-                        _fileListLiveData.value?.data,
+                        _fileListStateFlow.value?.data,
                         "not a folder or no read access."
                     )
                 )
