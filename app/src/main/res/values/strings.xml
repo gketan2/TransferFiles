@@ -9,8 +9,10 @@
         <item>Type</item>
     </string-array>
 
-    <string name="item_in_total">%d item in total</string>
-    <string name="items_in_total">%d items in total</string>
+    <plurals name="items_in_total">
+        <item quantity="one">%d item in total</item>
+        <item quantity="other">%d items in total</item>
+    </plurals>
 
     <string name="no_files">No files</string>
 </resources>

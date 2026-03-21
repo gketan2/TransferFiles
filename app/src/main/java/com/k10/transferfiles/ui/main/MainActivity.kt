@@ -22,7 +22,7 @@ class MainActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         setContentView(ComposeView(this).apply {
             setContent {
-                MainActivityView(viewModel)
+                MainActivityView(viewModel = viewModel)
             }
         })
         viewModel.getFilesInPath()
